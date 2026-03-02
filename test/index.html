@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Simple WebGL 2D Shooter</title>
+<style>
+  body { margin: 0; overflow: hidden; background: black; }
+  canvas { display: block; margin: auto; background: #111; }
+  #score {
+    position: absolute;
+    color: white;
+    top: 10px;
+    left: 10px;
+    font-family: Arial;
+  }
+</style>
+</head>
+<body>
+<div id="score">Score: 0</div>
+<canvas id="glcanvas" width="800" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("glcanvas");
+const gl = canvas.getContext("webgl");
+
+const vertexShaderSource = `
+attribute vec2 a_position;
+uniform vec2 u_resolution;
+void main() {
+    vec2 zeroToOne = a_position / u_resolution;
+    vec2 zeroToTwo = zeroToOne * 2.0;
+    vec2 clipSpace = zeroToTwo - 1.0;
+    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+}
+`;
+
+const fragmentShaderSource = `
+precision mediump float;
+uniform vec4 u_color;
+void main() {
+    gl_FragColor = u_color;
+}
+`;
+
+function createShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  return shader;
+}
+
+const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+const program = gl.createProgram();
+gl.attachShader(program, vertexShader);
+gl.attachShader(program, fragmentShader);
+gl.linkProgram(program);
+gl.useProgram(program);
+
+const positionLocation = gl.getAttribLocation(program, "a_position");
+const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+const colorLocation = gl.getUniformLocation(program, "u_color");
+
+const positionBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+gl.enableVertexAttribArray(positionLocation);
+gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+
+let player = { x: 375, y: 550, width: 50, height: 20 };
+let bullets = [];
+let enemies = [];
+let score = 0;
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") player.x -= 20;
+  if (e.key === "ArrowRight") player.x += 20;
+  if (e.key === " ") {
+    bullets.push({ x: player.x + 22, y: player.y, width: 5, height: 10 });
+  }
+});
+
+function drawRect(x, y, width, height, color) {
+  const x1 = x;
+  const y1 = y;
+  const x2 = x + width;
+  const y2 = y + height;
+  const vertices = new Float32Array([
+    x1,y1, x2,y1, x1,y2,
+    x1,y2, x2,y1, x2,y2
+  ]);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  gl.uniform4fv(colorLocation, color);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+function collision(a, b) {
+  return a.x < b.x + b.width &&
+         a.x + a.width > b.x &&
+         a.y < b.y + b.height &&
+         a.y + a.height > b.y;
+}
+
+function spawnEnemy() {
+  enemies.push({
+    x: Math.random() * 760,
+    y: 0,
+    width: 40,
+    height: 20
+  });
+}
+
+setInterval(spawnEnemy, 1000);
+
+function update() {
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // Player
+  drawRect(player.x, player.y, player.width, player.height, [0,1,0,1]);
+
+  // Bullets
+  bullets.forEach((b, i) => {
+    b.y -= 5;
+    drawRect(b.x, b.y, b.width, b.height, [1,1,0,1]);
+  });
+
+  // Enemies
+  enemies.forEach((e, ei) => {
+    e.y += 2;
+    drawRect(e.x, e.y, e.width, e.height, [1,0,0,1]);
+
+    bullets.forEach((b, bi) => {
+      if (collision(b, e)) {
+        enemies.splice(ei,1);
+        bullets.splice(bi,1);
+        score += 10;
+        document.getElementById("score").innerText = "Score: " + score;
+      }
+    });
+  });
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+</body>
+</html>
