@@ -18,7 +18,7 @@
   <!-- Mingpu -->
   <div class="ar-section">
     <div class="head-title">La Dame à la licorne</div>
-    <div class="sub-title">The 3D model is a digital reconstruction of a woman’s dress from the “Taste” tapestry from the “Lady and the Unicorn” (La Dame à la licorne) series. The set of six tapestries is on display in the Musée de Cluny, Paris</div>
+    <div class="sub-title">The 3D model is a digital reconstruction of a woman’s dress from the “Taste” tapestry from the “Lady and the Unicorn” (La Dame à la licorne) series. The set of six tapestries is on display in the Musée de Cluny, Paris. Design By Mariia Moskvina</div>
     <model-viewer id="model1"
       src="AR.glb"
       ios-src="AR.usdz"
@@ -40,10 +40,31 @@
     <!-- Human -->
   <div class="ar-section">
     <div class="head-title">Dress for kids (Design patent)</div>
-    <div class="sub-title">The 3D model presents a computer reconstruction of a dress for kids (Design patent application # 2023502244 RU). The dress consists of the front and back parts, sleeves and collar. The garment is made of a velvet fabric</div>
+    <div class="sub-title">The 3D model presents a computer reconstruction of a dress for kids (Design patent application # 2023502244 RU). The dress consists of the front and back parts, sleeves and collar. The garment is made of a velvet fabric. Design By Mariia Moskvina</div>
     <model-viewer id="model1"
       src="AR2.glb"
       ios-src="AR2.usdz"
+      ar
+      ar-modes="scene-viewer webxr quick-look"
+      camera-controls
+      autoplay
+      auto-rotate
+      shadow-intensity="1"
+      shadow-softness="1"
+      environment-image="neutral.hdr"
+      loading="eager"
+      reveal="auto"
+      style="width: 100%; height: 400px;">
+    </model-viewer>
+    <button class="ar-button" onclick="triggerAR('model2')">Play AR</button>
+  </div>
+      <!-- Human -->
+  <div class="ar-section">
+    <div class="head-title">Shopper Bag - exercise</div>
+    <div class="sub-title">Shopper bag exercise practiced during the Bag and Metal Hardware 3D Design course through CLO 3D + Rhinoceros design software. Design By Arsutoria - The Workshop School</div>
+    <model-viewer id="model1"
+      src="AR2.glb"
+      ios-src="AR3.usdz"
       ar
       ar-modes="scene-viewer webxr quick-look"
       camera-controls
